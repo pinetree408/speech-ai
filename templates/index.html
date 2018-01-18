@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head lang="en">
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="{{ url_for('static', filename='js/ai.js')}}"></script>
+    <script src="https://use.fontawesome.com/216ca6d25d.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+    <meta charset="UTF-8">
+    <title>chatbot</title>
+  </head>
+  <body>
+    <div class="youtube-player" id="player"></div>
+    <div class="music-player">
+      <div id="music-controller">
+        <div id="music-controller-title"></div>
+	<div id="music-controller-progress">
+          <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="0" class="slider" id="myRange">
+          </div>
+        </div>
+	<div>
+          <div id="music-controller-volume">
+            <div class="slidecontainer">
+              <input type="range" min="1" max="100" value="0" id="volumeRange">
+            </div>
+	  </div>
+          <div id="music-controller-mute">unmute</div>
+          <div id="music-controller-play">play</div>
+	</div>
+      </div>
+      <div id="ai-controller">
+        <button id="recognition-start" ><i class="fa fa-microphone"></i></button>
+        <p>You said: <em id="output-you">...</em></p>
+        <p>Bot replied: <em id="output-bot">...</em></p>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/youtube.js')}}"></script>
+  </body>
+</html>

@@ -4,6 +4,7 @@
 import os
 import apiai
 import json
+import random
 from base64 import b64encode
 from flask import Flask, render_template, session
 from flask_socketio import SocketIO, emit
@@ -56,7 +57,6 @@ def request(message):
     response = request.getresponse().read()
     response_json = json.loads(response)
     result = response_json['result']
-    print result
 
     song = {
         'id': '',
@@ -66,11 +66,13 @@ def request(message):
         target = ''
         if len(result['parameters']['artist']) != 0:
             target = result['parameters']['artist'][0]
-        elif result['parameters']['song'] != '':
-            target = result['parameters']['song']
-        elif result['parameters']['genre'] != '':
-            target = result['parameters']['genre']
-        video_list = youtube.search_videos(str(target))
+        if result['parameters']['song'] != '':
+            target = target + ' ' + result['parameters']['song']
+        if result['parameters']['genre'] != '':
+            target = target + ' ' + result['parameters']['genre']
+        print target
+        video_list = youtube.search_videos(str(target.strip()))
+        random.shuffle(video_list)
         song['id']= video_list[0]['id']['videoId']
         song['title'] = video_list[0]['snippet']['title']
     emit("response", {

@@ -18,12 +18,15 @@ $(document).ready(function(){
         case 'music.play' :
           if (player != undefined) {
             player.loadVideoById(msg.song.id);
+	    player.setVolume($("#volumeRange").val());
 	    progressTimer = setInterval(function(){
               var unit  = (player.getCurrentTime() / player.getDuration()) * 100;
 	      $("#myRange").val(unit);
 	    }, progressTimerInterval);
             $("#music-controller-title").text(msg.song.title);
-            response = 'okay, i will play ' + msg.song.title + '.';
+	    $("#music-controller-play > i").attr("class", 'fa fa-pause');
+	    $("#music-controller-stop > i").attr("class", 'fa fa-stop-circle');
+            response = 'okay, i will play the song.';
           } else {
             response = 'The player has not been set.'
           }
@@ -33,7 +36,7 @@ $(document).ready(function(){
 	    clearInterval(progressTimer);
 	    $("#myRang").val(0);
             player.stopVideo();
-	    $("music-controller-play").text("stop");
+	    $("#music-controller-stop > i").attr("class", 'fa fa-stop-circle-o');
             response = 'okay, i will stop.';
           } else {
             response = 'The player has not been set.'
@@ -46,7 +49,8 @@ $(document).ready(function(){
               var unit  = (player.getCurrentTime() / player.getDuration()) * 100;
 	      $("#myRange").val(unit);
 	    }, progressTimerInterval);
-	    $("music-controller-play").text("play");
+	    $("#music-controller-play > i").attr("class", 'fa fa-pause');
+	    $("#music-controller-stop > i").attr("class", 'fa fa-stop-circle');
             response = 'okay, i will play.';
           } else {
             response = 'The player has not been set.'
@@ -56,7 +60,7 @@ $(document).ready(function(){
           if (player != undefined) {
 	    clearInterval(progressTimer);
             player.pauseVideo();
-	    $("music-controller-pause").text("pause");
+	    $("#music-controller-play > i").attr("class", 'fa fa-play');
             response = 'okay, i will pause.';
           } else {
             response = 'The player has not been set.'
@@ -65,7 +69,7 @@ $(document).ready(function(){
         case 'music_player_control.mute':
           if (player != undefined) {
             player.mute();
-	    $("music-controller-mute").text("mute");
+	    $("#music-controller-mute > i").attr('class', 'fa fa-volume-off');
             response = 'okay, i will mute.';
           } else {
             response = 'The player has not been set.'
@@ -74,8 +78,26 @@ $(document).ready(function(){
         case 'music_player_control.unmute':
           if (player != undefined) {
             player.unMute();
-	    $("music-controller-mute").text("unmute");
+            $("#music-controller-mute > i").attr('class', 'fa fa-volume-up');
             response = 'okay, i will unmute.';
+          } else {
+            response = 'The player has not been set.'
+          }
+          break;
+        case 'music_player_control.volumeup':
+          if (player != undefined) {
+            $("#volumeRange").val(player.getVolume() + 10);
+            player.setVolume(player.getVolume() + 10);
+            response = 'okay, i will increase volume.';
+          } else {
+            response = 'The player has not been set.'
+          }
+          break;
+        case 'music_player_control.volumedown':
+          if (player != undefined) {
+            $("#volumeRange").val(player.getVolume() - 10);
+            player.setVolume(player.getVolume() - 10);
+            response = 'okay, i will decrease volume.';
           } else {
             response = 'The player has not been set.'
           }
@@ -132,29 +154,33 @@ $(document).ready(function(){
   $("#music-controller-mute").click(function() {
     if (player.isMuted()) {
       player.unMute();
-      $("#music-controller-mute").text("unmute");
+      $("#volumeRange").val(player.getVolume());
+      $("#music-controller-mute > i").attr('class', 'fa fa-volume-up');
     } else {
       player.mute();
-      $("#music-controller-mute").text("mute")
+      $("#volumeRange").val(0);
+      $("#music-controller-mute > i").attr('class', 'fa fa-volume-off');
     }
   });
 
   $("#music-controller-play").click(function() {
     switch (player.getPlayerState()) {
       case 0:
-        // stop
+      case 5:
+        // stop (ended, cued)
         player.playVideo();
 	progressTimer = setInterval(function(){
           var unit  = (player.getCurrentTime() / player.getDuration()) * 100;
 	  $("#myRange").val(unit);
 	}, progressTimerInterval);
-        $("#music-controller-play").text("play");
+	$("#music-controller-play > i").attr("class", 'fa fa-pause');
+	$("#music-controller-stop > i").attr("class", 'fa fa-stop-circle');
 	break;
       case 1:
         // play
 	clearInterval(progressTimer);
 	player.pauseVideo();
-	$("#music-controller-play").text("pause");
+	$("#music-controller-play > i").attr("class", 'fa fa-play');
         break;
       case 2:
         // pause
@@ -163,8 +189,41 @@ $(document).ready(function(){
           var unit  = (player.getCurrentTime() / player.getDuration()) * 100;
 	  $("#myRange").val(unit);
 	}, progressTimerInterval);
-	$("#music-controller-play").text("play");
+	$("#music-controller-play > i").attr("class", 'fa fa-pause');
 	break;
     }
+  });
+
+  $("#music-controller-stop").click(function() {
+    switch (player.getPlayerState()) {
+      case 0:
+      case 5:
+        // stop (ended, cued)
+        player.playVideo();
+	progressTimer = setInterval(function(){
+          var unit  = (player.getCurrentTime() / player.getDuration()) * 100;
+	  $("#myRange").val(unit);
+	}, progressTimerInterval);
+	$("#music-controller-play > i").attr("class", 'fa fa-pause');
+	$("#music-controller-stop > i").attr("class", 'fa fa-stop-circle');
+	break;
+      case 1:
+        // play
+	clearInterval(progressTimer);
+	player.stopVideo();
+	$("#music-controller-play > i").attr("class", 'fa fa-play');
+	$("#music-controller-stop > i").attr("class", 'fa fa-stop-circle-o');
+        break;
+      case 2:
+        // pause
+	player.stopVideo();
+	$("#music-controller-play > i").attr("class", 'fa fa-play');
+	$("#music-controller-stop > i").attr("class", 'fa fa-stop-circle-o');
+	break;
+    }
+  });
+
+  $("#volumeRange").on("input", function(e) {
+    player.setVolume($("#volumeRange").val());
   });
 });

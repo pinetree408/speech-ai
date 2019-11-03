@@ -11,4 +11,4 @@ numpy==1.14.0
 python-engineio==2.0.2
 python-socketio==1.8.4
 six==1.11.0
-Werkzeug==0.14.1
+Werkzeug==0.15.3
